@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cartão de Boas-Vindas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap");
+
+      .title-font {
+        font-family: "Playfair Display", serif;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-fade-in {
+        animation: fadeIn 0.8s ease-out forwards;
+      }
+
+      .floating {
+        animation: floating 3s ease-in-out infinite;
+      }
+
+      @keyframes floating {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+      }
+
+      /* Estilos de impressão robustos */
+      @media print {
+        html,
+        body {
+          background: #ffffff !important;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+
+        .no-print {
+          display: none !important;
+        }
+
+        #cartao {
+          box-shadow: none !important;
+          border: 1px solid #000 !important;
+          background-image: none !important;
+        }
+
+        /* Força todo o texto e ícones para preto e fundos para transparente */
+        #cartao * {
+          color: #000 !important;
+          background-color: transparent !important;
+          background-image: none !important;
+          box-shadow: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-tr from-blue-50 to-blue-100 min-h-screen flex items-center justify-center p-4"
+  >
+    <div
+      id="cartao"
+      class="bg-white shadow-2xl rounded-2xl p-6 md:p-8 text-center animate-fade-in w-full max-w-md"
+    >
+      <div class="floating mb-4">
+        <img src="./img/ad.jpg" class="w-16 h-16 mx-auto rounded-full" />
+      </div>
+
+      <h1 class="title-font text-2xl md:text-3xl font-bold text-[#004181] mb-4">
+        🎉 Bem-vindo à Família de Cristo!
+      </h1>
+
+      <div class="bg-blue-50 rounded-xl p-4 mb-4 border border-blue-200">
+        <p id="mensagem" class="text-gray-900 font-medium text-lg"></p>
+        <p id="data" class="text-sm text-gray-900 mt-2 font-semibold"></p>
+        <p id="motivo" class="italic text-gray-900 mt-2 text-sm"></p>
+      </div>
+
+      <blockquote
+        class="border-l-4 border-[#004181] pl-4 text-gray-900 mb-4 text-sm md:text-base text-left bg-blue-50 p-3 rounded-r-lg"
+      >
+        "Porque este meu filho estava morto, e reviveu, tinha-se perdido, e foi
+        achado. E começaram a alegrar-se."
+        <span class="block text-sm mt-1 font-semibold text-[#004181]"
+          >Lucas 15:24</span
+        >
+      </blockquote>
+
+      <div
+        class="text-left text-gray-900 text-sm mb-4 bg-blue-50 p-4 rounded-xl border border-blue-200"
+      >
+        <p class="font-semibold text-[#004181] mb-2">Dias de culto:</p>
+        <ul class="ml-4 list-disc space-y-1">
+          <li>Segunda-feira (oração): 19h30</li>
+          <li>Quarta-feira: 19h30</li>
+          <li>Sexta-feira: 19h30</li>
+          <li>Domingo: 18h30</li>
+        </ul>
+        <p class="mt-3 font-semibold text-[#004181]">Endereço:</p>
+        <p>Rua Água Branca, 81 — Vila Ruy Barbosa, Jundiaí</p>
+      </div>
+
+      <p
+        class="text-[#004181] font-semibold mb-4 text-sm md:text-base border-t border-blue-200 pt-4"
+      >
+        Igreja Evangélica Assembleia de Deus — Ruy Barbosa
+      </p>
+
+      <!-- Botões que serão ocultos na impressão -->
+      <div class="no-print space-y-3">
+        <button
+          id="download"
+          class="bg-[#004181] text-white px-4 py-3 rounded-xl hover:bg-[#002c5a] transition-all w-full flex items-center justify-center"
+        >
+          <i class="fas fa-camera mr-2"></i> Salvar como imagem
+        </button>
+
+        <a
+          href="index.html"
+          class="block text-[#004181] hover:text-[#002c5a] transition-colors text-sm"
+        >
+          <i class="fas fa-arrow-left mr-1"></i> Criar outro cartão
+        </a>
+      </div>
+    </div>
+
+    <script>
+      // Obter parâmetros da URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const nome = decodeURIComponent(urlParams.get("nome") || "");
+      const dataParam = decodeURIComponent(urlParams.get("data") || "");
+      const motivo = decodeURIComponent(urlParams.get("motivo") || "");
+      const tipo = decodeURIComponent(urlParams.get("tipo") || "");
+
+      // Formatar data
+      let dataFormatada = "";
+      if (dataParam) {
+        const data = new Date(dataParam);
+        dataFormatada = data.toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        });
+      }
+
+      // Definir mensagem baseada no tipo de decisão
+      let mensagem = "";
+      if (tipo === "primeira") {
+        mensagem = `${nome}, celebramos sua decisão de aceitar Jesus Cristo como seu Salvador!`;
+      } else if (tipo === "retornando") {
+        mensagem = `${nome}, celebramos seu retorno aos braços do Pai!`;
+      } else {
+        mensagem = `${nome}, celebramos sua decisão por Cristo!`;
+      }
+
+      // Atualizar elementos da página
+      document.getElementById("mensagem").textContent = mensagem;
+      document.getElementById("data").textContent = dataFormatada
+        ? `Data da decisão: ${dataFormatada}`
+        : "";
+      document.getElementById("motivo").textContent = motivo || "";
+
+      // Configurar download da imagem
+      document
+        .getElementById("download")
+        .addEventListener("click", function () {
+          const cardElement = document.getElementById("cartao");
+          const botoes = document.querySelector(".no-print");
+
+          // Ocultar botões e remover animações para a captura
+          if (botoes) {
+            botoes.style.display = "none";
+          }
+          cardElement.classList.remove("floating");
+
+          // Aguarda um momento para garantir que as mudanças foram aplicadas
+          setTimeout(() => {
+            domtoimage
+              .toPng(cardElement, {
+                quality: 1,
+                bgcolor: "#ffffff",
+                width: cardElement.offsetWidth * 3,
+                height: cardElement.offsetHeight * 3,
+                style: {
+                  transform: "scale(3)",
+                  transformOrigin: "top left",
+                  width: cardElement.offsetWidth + "px",
+                  height: cardElement.offsetHeight + "px",
+                },
+              })
+              .then(function (dataUrl) {
+                // Restaura a interface
+                if (botoes) {
+                  botoes.style.display = "block";
+                }
+                cardElement.classList.add("floating");
+
+                const link = document.createElement("a");
+                link.download = `cartao-boas-vindas-${nome}.png`;
+                link.href = dataUrl;
+                link.click();
+              })
+              .catch(function (error) {
+                console.error("Erro ao gerar imagem:", error);
+                alert("Erro ao gerar imagem. Tente novamente.");
+
+                // Restaura a interface mesmo em caso de erro
+                if (botoes) {
+                  botoes.style.display = "block";
+                }
+                cardElement.classList.add("floating");
+              });
+          }, 100);
+        });
+    </script>
+  </body>
+</html>

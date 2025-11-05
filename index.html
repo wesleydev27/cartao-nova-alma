@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cartão de Boas-Vindas - Novo Nascimento</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap");
+
+      body {
+        font-family: "Montserrat", sans-serif;
+      }
+
+      .title-font {
+        font-family: "Playfair Display", serif;
+      }
+
+      .card-shadow {
+        box-shadow: 0 10px 25px rgba(0, 65, 129, 0.15);
+      }
+
+      .gradient-bg {
+        background: linear-gradient(135deg, #e6f0ff 0%, #ffffff 100%);
+      }
+
+      .btn-primary {
+        background-color: #004181;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        background-color: #002c5a;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 65, 129, 0.3);
+      }
+
+      .floating-animation {
+        animation: floating 3s ease-in-out infinite;
+      }
+
+      @keyframes floating {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen gradient-bg flex flex-col items-center justify-center p-4"
+  >
+    <div class="w-full max-w-2xl mx-auto">
+      <!-- Cabeçalho -->
+      <header class="text-center mb-8 md:mb-12">
+        <div class="floating mb-4">
+          <img src="./img/ad.jpg" class="w-16 h-16 mx-auto rounded-full" />
+        </div>
+        <h1
+          class="title-font text-3xl md:text-4xl font-bold text-[#004181] mb-4"
+        >
+          Novo Nascimento
+        </h1>
+        <p class="text-gray-600 max-w-2xl mx-auto text-sm md:text-base">
+          Preencha os dados abaixo e gere um cartão.
+        </p>
+      </header>
+
+      <!-- Formulário -->
+      <div class="bg-white rounded-2xl card-shadow p-6 md:p-8">
+        <form id="form" class="space-y-6">
+          <!-- Campo Nome -->
+          <div>
+            <label
+              for="nome"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              <i class="fas fa-user text-[#004181] mr-2"></i>Nome da pessoa
+            </label>
+            <input
+              type="text"
+              id="nome"
+              placeholder="Digite o nome completo"
+              class="w-full border border-gray-300 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-[#004181] focus:border-transparent transition-all"
+              required
+            />
+          </div>
+
+          <!-- Campo Data -->
+          <div>
+            <label
+              for="data"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              <i class="fas fa-calendar-alt text-[#004181] mr-2"></i>Data da
+              decisão
+            </label>
+            <input
+              type="date"
+              id="data"
+              class="w-full border border-gray-300 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-[#004181] focus:border-transparent transition-all"
+              required
+            />
+          </div>
+
+          <!-- Campo Motivo -->
+          <div>
+            <label
+              for="motivo"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              <i class="fas fa-heart text-[#004181] mr-2"></i>Motivo (opcional)
+            </label>
+            <textarea
+              id="motivo"
+              placeholder="Compartilhe o motivo desta decisão especial..."
+              rows="3"
+              class="w-full border border-gray-300 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-[#004181] focus:border-transparent transition-all"
+            ></textarea>
+          </div>
+
+          <!-- Campo Tipo de Decisão -->
+          <div>
+            <label
+              for="tipo"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              <i class="fas fa-cross text-[#004181] mr-2"></i>Tipo de decisão
+            </label>
+            <select
+              id="tipo"
+              class="w-full border border-gray-300 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-[#004181] focus:border-transparent transition-all"
+              required
+            >
+              <option value="">Selecione uma opção</option>
+              <option value="primeira">
+                Aceitando Jesus pela primeira vez
+              </option>
+              <option value="retornando">Retornando para Jesus</option>
+            </select>
+          </div>
+
+          <!-- Botão de Envio -->
+          <button
+            type="submit"
+            class="btn-primary text-white font-semibold py-4 px-6 rounded-xl w-full flex items-center justify-center"
+          >
+            <i class="fas fa-gift mr-2"></i> Gerar Cartão de Boas-Vindas
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="mt-12 text-center text-gray-500 text-sm">
+      <p>
+        Desenvolvido com <i class="fas fa-heart text-red-500"></i> para celebrar
+        vidas transformadas
+      </p>
+    </footer>
+
+    <script>
+      // Envio do formulário
+      document.getElementById("form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const nome = encodeURIComponent(document.getElementById("nome").value);
+        const data = encodeURIComponent(document.getElementById("data").value);
+        const motivo = encodeURIComponent(
+          document.getElementById("motivo").value
+        );
+        const tipo = encodeURIComponent(document.getElementById("tipo").value);
+
+        // Redirecionar para card.html com os parâmetros
+        window.location.href = `card.html?nome=${nome}&data=${data}&motivo=${motivo}&tipo=${tipo}`;
+      });
+    </script>
+  </body>
+</html>
