@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cartão de Boas-Vindas</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -137,6 +137,14 @@
           <i class="fas fa-camera mr-2"></i> Salvar como imagem
         </button>
 
+        <button
+          id="share"
+          style="display: none"
+          class="bg-green-500 text-white px-4 py-3 rounded-xl hover:bg-green-600 transition-all w-full flex items-center justify-center"
+        >
+          <i class="fas fa-share-alt mr-2"></i> Compartilhar
+        </button>
+
         <a
           href="index.html"
           class="block text-[#004181] hover:text-[#002c5a] transition-colors text-sm"
@@ -147,18 +155,22 @@
     </div>
 
     <script>
+      // --- LÓGICA INICIAL ---
+
       // Obter parâmetros da URL
       const urlParams = new URLSearchParams(window.location.search);
-      const nome = decodeURIComponent(urlParams.get("nome") || "");
+      const nome = decodeURIComponent(urlParams.get("nome") || "Pessoa");
       const dataParam = decodeURIComponent(urlParams.get("data") || "");
       const motivo = decodeURIComponent(urlParams.get("motivo") || "");
       const tipo = decodeURIComponent(urlParams.get("tipo") || "");
 
-      // Formatar data
+      // Formatar data (com correção de fuso horário)
       let dataFormatada = "";
       if (dataParam) {
         const data = new Date(dataParam);
-        dataFormatada = data.toLocaleDateString("pt-BR", {
+        const userTimezoneOffset = data.getTimezoneOffset() * 60000;
+        const correctedDate = new Date(data.getTime() + userTimezoneOffset);
+        dataFormatada = correctedDate.toLocaleDateString("pt-BR", {
           day: "2-digit",
           month: "2-digit",
           year: "numeric",
@@ -182,58 +194,89 @@
         : "";
       document.getElementById("motivo").textContent = motivo || "";
 
-      // Configurar download da imagem
-      document
-        .getElementById("download")
-        .addEventListener("click", function () {
-          const cardElement = document.getElementById("cartao");
-          const botoes = document.querySelector(".no-print");
+      // --- LÓGICA DE BOTÕES (DOWNLOAD E COMPARTILHAMENTO) ---
 
-          // Ocultar botões e remover animações para a captura
-          if (botoes) {
-            botoes.style.display = "none";
-          }
-          cardElement.classList.remove("floating");
+      const cardElement = document.getElementById("cartao");
+      const downloadBtn = document.getElementById("download");
+      const shareBtn = document.getElementById("share");
 
-          // Aguarda um momento para garantir que as mudanças foram aplicadas
-          setTimeout(() => {
-            domtoimage
-              .toPng(cardElement, {
-                quality: 1,
-                bgcolor: "#ffffff",
-                width: cardElement.offsetWidth * 3,
-                height: cardElement.offsetHeight * 3,
-                style: {
-                  transform: "scale(3)",
-                  transformOrigin: "top left",
-                  width: cardElement.offsetWidth + "px",
-                  height: cardElement.offsetHeight + "px",
-                },
-              })
-              .then(function (dataUrl) {
-                // Restaura a interface
-                if (botoes) {
-                  botoes.style.display = "block";
-                }
-                cardElement.classList.add("floating");
+      /**
+       * Prepara a UI, gera a imagem do cartão e restaura a UI.
+       * @param {number} pixelRatio - A resolução da imagem (ex: 2 para 2x).
+       * @returns {Promise<string>} A imagem em formato data URL.
+       */
+      async function generateCardImage(pixelRatio = 2) {
+        const botoes = document.querySelector(".no-print");
+        
+        // 1. Preparar UI para captura
+        if (botoes) botoes.style.display = "none";
+        cardElement.classList.remove("floating");
 
-                const link = document.createElement("a");
-                link.download = `cartao-boas-vindas-${nome}.png`;
-                link.href = dataUrl;
-                link.click();
-              })
-              .catch(function (error) {
-                console.error("Erro ao gerar imagem:", error);
-                alert("Erro ao gerar imagem. Tente novamente.");
+        try {
+          // Delay para garantir que a UI foi renderizada antes da captura
+          await new Promise((resolve) => setTimeout(resolve, 100));
 
-                // Restaura a interface mesmo em caso de erro
-                if (botoes) {
-                  botoes.style.display = "block";
-                }
-                cardElement.classList.add("floating");
+          const dataUrl = await htmlToImage.toPng(cardElement, {
+            quality: 1,
+            backgroundColor: "#ffffff",
+            pixelRatio: pixelRatio,
+          });
+          return dataUrl;
+        } finally {
+          // 2. Restaurar UI após captura
+          if (botoes) botoes.style.display = "block";
+          cardElement.classList.add("floating");
+        }
+      }
+
+      // Configurar botão de Download
+      downloadBtn.addEventListener("click", async () => {
+        try {
+          const dataUrl = await generateCardImage(2); // Qualidade alta (2x) para download
+          const link = document.createElement("a");
+          link.download = `cartao-boas-vindas-${nome}.png`;
+          link.href = dataUrl;
+          link.click();
+        } catch (error) {
+          console.error("Erro ao gerar imagem para download:", error);
+          alert("Erro ao gerar imagem. Tente novamente.");
+        }
+      });
+
+      // Configurar botão de Compartilhamento
+      if (navigator.share && navigator.canShare) {
+        shareBtn.style.display = "flex"; // Mostra o botão se a API for suportada
+
+        shareBtn.addEventListener("click", async () => {
+          try {
+            // Gera imagem com qualidade boa para compartilhamento (mais leve)
+            const dataUrl = await generateCardImage(2);
+            
+            // Converte a imagem de dataURL para um objeto File
+            const blob = await (await fetch(dataUrl)).blob();
+            const file = new File([blob], `cartao-boas-vindas-${nome}.png`, {
+              type: blob.type,
+            });
+
+            // Verifica se o navegador pode compartilhar arquivos
+            if (navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                files: [file],
+                title: "Cartão de Boas-Vindas",
+                text: "Celebre esta nova jornada!",
               });
-          }, 100);
+            } else {
+              alert("Seu navegador não suporta o compartilhamento de arquivos.");
+            }
+          } catch (error) {
+            // Ignora o erro se o usuário cancelar a ação de compartilhar
+            if (error.name !== "AbortError") {
+              console.error("Erro ao compartilhar:", error);
+              alert("Ocorreu um erro ao tentar compartilhar.");
+            }
+          }
         });
+      }
     </script>
   </body>
 </html>
